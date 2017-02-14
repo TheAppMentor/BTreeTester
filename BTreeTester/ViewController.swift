@@ -27,12 +27,17 @@ class ViewController: UIViewController {
         theTree.insertNoder(inputNode: BTNode(0))
         theTree.insertNoder(inputNode: BTNode(-1))
 
-        theTree.search(10)
+        print("Searching....10 \(theTree.find(10))")
+        print("Delete Status ... \(theTree.delete(10))")
+        print("Searching....10 \(theTree.find(10))")
 
         let theTreeViewer = BTViewer()
         theTreeViewer.displayTree(theTree)
 
-        //theTree.traverseTree(traversalType: .PreOrder)
+        print("result \(theTree.traverseTree(traversalType: .PreOrder))")
+        print("result \(theTree.traverseTree(traversalType: .PostOrder))")
+        print("result \(theTree.traverseTree(traversalType: .InOrder))")
+
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -58,6 +63,7 @@ class BTNode : CustomStringConvertible, Comparable{
         return "\t\t\(_parentNode) \n \t\t¦ \n  \t\t\(self.theValue) \n\t ⋰  ⋱  \n   \(leftNode?.value ?? -1) \t  \(rightNode?.value ?? -1)"
     }
     
+    //TODO: rename this to key.. and we should add a value guy also.
     private var theValue : Int
     private var _parentNode : BTNode? = nil
     private var leftNode : BTNode? = nil
@@ -71,7 +77,15 @@ class BTNode : CustomStringConvertible, Comparable{
         theValue = value
     }
     
-    var value : Int {return theValue}
+    var value : Int {
+        get{
+        return theValue
+        }
+        
+        set {
+            theValue = newValue
+        }
+}
     
     var leftChildNode : BTNode? {
         get{
@@ -104,6 +118,17 @@ class BTNode : CustomStringConvertible, Comparable{
 
     var hasRightNode : Bool{
         return rightChildNode != nil
+    }
+
+    var hasLeftAndRightNodes : Bool{
+        return hasLeaves && hasRightNode
+    }
+    
+    var hasOnlyOneChildNode : Bool{
+        if hasRightNode && hasLeftNode == false {return true}
+        if hasLeftNode && hasRightNode == false {return true}
+        
+        return false
     }
     
     var hasLeaves : Bool{
@@ -200,10 +225,46 @@ class BTree{
     
     
     
+    //MARK: Searching
+    
+    func find(_ value : Int) -> BTNode? {
+        if _treeHeight == 0 {return nil}
+        
+        return lookUp(value)
+    }
+    
+    
+    func lookUp(_ value : Int, startingNode : BTNode? = nil) -> BTNode? {
+        
+        let tempWorkingNode = startingNode ?? _rootNode!
+        
+        if tempWorkingNode.value == value{return tempWorkingNode}
+        
+        if tempWorkingNode.value < value {
+            if tempWorkingNode.hasRightNode{
+                return lookUp(value, startingNode: tempWorkingNode.rightChildNode)
+            }
+            return nil
+        }
+        
+        if tempWorkingNode.value > value {
+            if tempWorkingNode.hasLeftNode{
+                return lookUp(value, startingNode: tempWorkingNode.leftChildNode)
+            }
+            return nil
+        }
+        
+        return nil
+        
+    }
+    
+    
+    
+    
     
 
     // Finding a node in the Tree :
-    func  search(_ value : Int) -> BTNode?  {
+    func  search(_ value : Int) -> BTNode? {
         
         if _treeHeight == 0 {return nil}
         return checkNode(node: _rootNode!, value)
@@ -244,22 +305,137 @@ class BTree{
     }
     
     
+    //MARK: Tree Traversal
     
-    func traverseTree(traversalType : BTreeTraverseType = BTreeTraverseType.PreOrder){
+    func traverseTree(traversalType : BTreeTraverseType = BTreeTraverseType.PreOrder) -> [BTNode]{
         
         switch traversalType {
         case .PreOrder:
+            print("\n\n\n =====================================")
             print("Traversing the tree.. Pre_Order....")
-        default:
-            print("Not yet Implemented this Traversal")
-            break
+            return preOrderTraverse()
+            print("\n\n\n =====================================")
+
+        case .PostOrder:
+            print("\n\n\n =====================================")
+            print("Traversing the tree.. Post_Order....")
+            return postOrderTraverse()
+            print("\n\n\n =====================================")
+
+        case .InOrder:
+            print("\n\n\n =====================================")
+            print("Traversing the tree.. In_Order....")
+            return InOrderTraverse()
+            print("\n\n\n =====================================")
         }
     }
     
-    func preOrderTraverse() {
+    
+    func preOrderTraverse(startNode : BTNode? = nil, returnArray: [BTNode]? = nil) -> [BTNode] {
+        let currentWorkingNode = startNode ?? _rootNode!
+        var tempNodeArray : [BTNode] = returnArray ?? [BTNode]()
         
+        //print("Value...   \(currentWorkingNode.value)")
+        tempNodeArray.append(currentWorkingNode)
+        
+        if currentWorkingNode.hasLeftNode {
+            return preOrderTraverse(startNode: currentWorkingNode.leftChildNode!, returnArray: tempNodeArray)
+        }
+
+        if currentWorkingNode.hasRightNode{
+            return preOrderTraverse(startNode: currentWorkingNode.rightChildNode!, returnArray: tempNodeArray)
+        }
+        return tempNodeArray
+    }
+
+    
+    func postOrderTraverse(startNode : BTNode? = nil, returnArray: [BTNode]? = nil) -> [BTNode] {
+        let currentWorkingNode = startNode ?? _rootNode!
+        var tempNodeArray : [BTNode] = returnArray ?? [BTNode]()
+
+        if currentWorkingNode.hasLeftNode {
+            return postOrderTraverse(startNode: currentWorkingNode.leftChildNode!, returnArray: tempNodeArray)
+        }
+        
+        if currentWorkingNode.hasRightNode{
+            return postOrderTraverse(startNode: currentWorkingNode.rightChildNode!, returnArray: tempNodeArray)
+        }
+        
+        //print("Value...   \(currentWorkingNode.value)")
+        tempNodeArray.append(currentWorkingNode)
+        return tempNodeArray
+
     }
     
+    func InOrderTraverse(startNode : BTNode? = nil, returnArray: [BTNode]? = nil) -> [BTNode] {
+        let currentWorkingNode = startNode ?? _rootNode!
+        var tempNodeArray : [BTNode] = returnArray ?? [BTNode]()
+        
+        if currentWorkingNode.hasLeftNode {
+            return InOrderTraverse(startNode: currentWorkingNode.leftChildNode!, returnArray: tempNodeArray)
+        }
+        print("Value...   \(currentWorkingNode.value)")
+        tempNodeArray.append(currentWorkingNode)
+        
+        if currentWorkingNode.hasRightNode{
+            return InOrderTraverse(startNode: currentWorkingNode.rightChildNode!, returnArray: tempNodeArray)
+        }
+        return tempNodeArray
+
+    }
+    
+    
+    func delete(_ value : Int) -> Bool {
+        
+        // Find the Node
+        if let nodeToDelete = find(value){
+            // Scenario 1 : Node to be deleted has no child nodes.
+            if nodeToDelete.hasLeaves == false {
+                cleanUpNode(nodeToDelete)
+                return true
+            }
+            
+            // Scenario 2 : Node to be deleted has ONLY one child node
+            if nodeToDelete.hasOnlyOneChildNode{
+                var tempNode = nodeToDelete.leftChildNode ?? nodeToDelete.rightChildNode
+                
+                tempNode?.parentNode = nodeToDelete.parentNode
+                cleanUpNode(nodeToDelete)
+                return true
+            }
+            
+            //TODO: This needs a clean up.
+            // Scenario 3.
+            if nodeToDelete.hasLeftAndRightNodes {
+                // Find the Min value of the right node.
+                let theReplacementNode = minValue(startingNode: nodeToDelete.rightChildNode!)
+                
+                // Only the Value is being replaced.. not the node.. !!
+                nodeToDelete.parentNode?.value = (theReplacementNode?.value)!
+                cleanUpNode(theReplacementNode!)
+            }
+        }
+        
+        return false
+    }
+    
+    func minValue(startingNode : BTNode) -> BTNode? {
+        let theArray = preOrderTraverse(startNode: startingNode)
+        return theArray.min()
+    }
+
+    func maxValue(startingNode : BTNode) -> BTNode? {
+        let theArray = preOrderTraverse(startNode: startingNode)
+        return theArray.max()
+    }
+
+    func  cleanUpNode(_ node : BTNode)  {
+        node.parentNode = nil
+        node.leftChildNode = nil
+        node.rightChildNode = nil
+    }
+    
+
     func printTreeProperties(){
         
         print("\n\nHeight : \(_treeHeight) -> \n\(_rootNode?.description ?? "NO Root Node")\n   -> RootNode : \(_rootNode?.value ?? -1) RootNode.lefNote : \(_rootNode?.leftChildNode?.value ?? -1)  RootNode.rightNode : \(_rootNode?.rightChildNode?.value ?? -1)")
