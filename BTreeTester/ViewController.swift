@@ -15,27 +15,19 @@ class ViewController: UIViewController {
         // Do any additional setup after loading the view, typically from a nib.
 
         let theTree = BTree()
-        theTree.insertNode(node: BTNode(8))
-        theTree.insertNode(node: BTNode(3))
-        theTree.insertNode(node: BTNode(1))
-        theTree.insertNode(node: BTNode(6))
-        theTree.insertNode(node: BTNode(4))
-        theTree.insertNode(node: BTNode(7))
-        theTree.insertNode(node: BTNode(10))
-        theTree.insertNode(node: BTNode(14))
-        theTree.insertNode(node: BTNode(13))
-        
-//        theTree.insertNode(node: BTNode(7))
-//        theTree.insertNode(node: BTNode(12))
-//        theTree.insertNode(node: BTNode(11))
-//        theTree.insertNode(node: BTNode(3))
-//        theTree.insertNode(node: BTNode(1))
-//        theTree.insertNode(node: BTNode(2))
-//        theTree.insertNode(node: BTNode(5))
-//        theTree.insertNode(node: BTNode(10))
-//        theTree.insertNode(node: BTNode(9))
-//        
-//        theTree.search(10)
+        theTree.insertNoder(inputNode: BTNode(8))
+        theTree.insertNoder(inputNode: BTNode(3))
+        theTree.insertNoder(inputNode: BTNode(1))
+        theTree.insertNoder(inputNode: BTNode(6))
+        theTree.insertNoder(inputNode: BTNode(4))
+        theTree.insertNoder(inputNode: BTNode(7))
+        theTree.insertNoder(inputNode: BTNode(10))
+        theTree.insertNoder(inputNode: BTNode(14))
+        theTree.insertNoder(inputNode: BTNode(13))
+        theTree.insertNoder(inputNode: BTNode(0))
+        theTree.insertNoder(inputNode: BTNode(-1))
+
+        theTree.search(10)
 
         let theTreeViewer = BTViewer()
         theTreeViewer.displayTree(theTree)
@@ -130,230 +122,86 @@ class BTree{
     
     private var _rootNode : BTNode?
     private var _treeHeight : Int = 0
+    private var _workingNode : BTNode? = nil
     
     var rootNode : BTNode? {
-        return _rootNode
+        get{
+            return _rootNode
+        }
+        set {
+            if _rootNode == nil {_rootNode = newValue}
+        }
     }
     
     var treeHeight : Int {
         return _treeHeight
     }
     
-    func setLeftNode(parentNode : BTNode, leftNode : BTNode) {
+    func setLeftNode(_ leftNode : BTNode, parentNode : BTNode) {
         parentNode.leftChildNode = leftNode
+        leftNode.parentNode = parentNode
         _treeHeight += 1
     }
 
-    func setRightNode(parentNode : BTNode, rightNode : BTNode) {
+    func setRightNode(_ rightNode : BTNode, parentNode : BTNode) {
         parentNode.rightChildNode = rightNode
+        rightNode.parentNode = parentNode
         _treeHeight += 1
+    }
+    
+    func setRootNode(_ node : BTNode){
+        rootNode = node
+        rootNode?.parentNode = nil
+        rootNode?.leftChildNode = nil
+        rootNode?.rightChildNode = nil
+        _treeHeight += 1
+        
     }
     
     
     
     
-    func insertNoder(inputNode : BTNode) {
+    func insertNoder(inputNode : BTNode, currentWorkingNode : BTNode? = nil) {
         
         // Empty Tree -> Insert as Root.
+        if _treeHeight == 0 && rootNode == nil {
+            setRootNode(inputNode)
+            return
+        }
         
+        let tempWorkingNode = currentWorkingNode ?? _rootNode!
         
-        // Current Working Node ==> Has no Leaves.. Insert Left or right based on value.
+        // If inputNode < CWC.value. Shift Left
+        if inputNode < tempWorkingNode {
+            if tempWorkingNode.hasLeftNode {
+                //Keep looking further to the left of current node.
+                return insertNoder(inputNode: inputNode, currentWorkingNode: tempWorkingNode.leftChildNode!)
+            }
+            
+            // If we have a node with no left leaf. Insert here.
+            setLeftNode(inputNode, parentNode: tempWorkingNode)
+            return
+        }
         
+        // If inputNode > CWC.value. Shift Right
+        if inputNode > tempWorkingNode {
+            if tempWorkingNode.hasRightNode {
+                // Keep looking further to the right of current node.
+                return insertNoder(inputNode: inputNode, currentWorkingNode: tempWorkingNode.rightChildNode!)
+            }
+            
+            // If we have a node with no right leaf. Insert here.
+            setRightNode(inputNode, parentNode: tempWorkingNode)
+            return
+        }
         
-        
-        // Current Working Node (CWN) ==> Is < input Node
-            // If CWN has no left node : Simply insert.
-        
-            // if CWN has left node :
-
-        
-        // Current Working Node (CWN) ==> Is > input Node
-        // If CWN has no left node : Simply insert.
-        
-        // if CWN has left node :
-
-        
-        
-        
+        return
     }
     
     
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
-    func insertNode(node : BTNode) -> Bool {
-        
-        // Empty Tree : Set node as root node.
-        if _treeHeight == 0 {
-            print("Empty Tree.. Setting Root Node  => Value \(node.value)")
-            _rootNode = node
-            node.leftChildNode = nil
-            node.rightChildNode = nil
-            node.parentNode = nil
-            _treeHeight += 1
-            return true
-        }
-        
-        // If the new node does not qualify to be a root node.
-        var currentWorkingNode = rootNode
-        
-        // If the current node has no leaves, compare value with the node and set either left or right node.
-        if currentWorkingNode?.hasLeaves == false {
-            if node.value < (currentWorkingNode?.value)!{
-                setLeftNode(parentNode: currentWorkingNode!, leftNode: node)
-            }else{
-                setRightNode(parentNode: currentWorkingNode!, rightNode: node)
-//                currentWorkingNode?.rightChildNode = node
-            }
-            node.parentNode = currentWorkingNode
-            return true
-        }
-        
-        repeat{
-            
-            if node.value <= currentWorkingNode!.value {
-                // We are working with the left half of the tree.
-                // Shift Left
-                
-                // If currrent node has no left node, simply set it.
-                if currentWorkingNode?.hasLeftNode == false {
-                    setLeftNode(parentNode: currentWorkingNode!, leftNode: node)
-                    return true
-                }
-                
-                if (currentWorkingNode?.leftChildNode?.value)! <= node.value{
-                    // We have lower values.. keep looking further down the tree.
-                    currentWorkingNode = currentWorkingNode?.leftChildNode!
-                    continue
-                } else {
-                    if currentWorkingNode?.hasRightNode == true{
-                        currentWorkingNode = currentWorkingNode?.rightChildNode!
-                        continue
-                    }else{
-                        setRightNode(parentNode: currentWorkingNode!, rightNode: node)
-                    }
-                }
-                
-            } else {
-                // We are working with the Right half of the tree.
-                // Shift Right.
-                
-                if currentWorkingNode?.hasRightNode == false {
-                    setRightNode(parentNode: currentWorkingNode!, rightNode: node)
-                    return true
-                }
-                
-                if currentWorkingNode?.hasLeftNode == true{
-                    if (currentWorkingNode?.leftChildNode?.value)! <= node.value{
-                        // We have lower values.. keep looking further down the tree.
-                        currentWorkingNode = currentWorkingNode?.leftChildNode!
-                        continue
-                    }
-                }
-                
-                else {
-                    currentWorkingNode = currentWorkingNode?.rightChildNode!
-                    continue
-                }
-                
-            }
-            
-        }while true
-    }
-    
-    
     // Finding a node in the Tree :
     func  search(_ value : Int) -> BTNode?  {
         
