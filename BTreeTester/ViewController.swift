@@ -8,12 +8,103 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+struct Hospital {
+    
+    let provider_id : String
+    let hospital_name : String
+    let address : String
+    let city : String
+    let state : String
+    let zip_code : String
+    let county_name : String
+    let hospital_type : String
+    
+    let emergency_services : Bool
+    let phone_number : String
+}
 
+
+class ViewController: UIViewController {
+    
+    typealias JSONObj = [String:AnyObject?]
+    
+    func extractJSONFromFile() -> [String:AnyObject?] {
+
+        let startTime = NSDate()
+        if let fileLocation = Bundle.main.url(forResource: "HospitalData", withExtension: "json"){
+            do {
+                let theD = try Data.init(contentsOf: fileLocation, options: Data.ReadingOptions.mappedIfSafe)
+                
+                if let theReturnD = try JSONSerialization.jsonObject(with: theD, options: .mutableLeaves) as? [String:AnyObject?]{
+                    print("Inside Function : Time to Run.. \(-startTime.timeIntervalSinceNow)")
+                    return theReturnD
+                }
+            } catch  {
+                print("We have an error extracting the file... ")
+            }
+        }
+        return  [String:AnyObject?]()
+    }
+    
+
+    func buildDictionary(theFullD : JSONObj) -> [Hospital]{
+        
+        var returnArray = [Hospital]()
+        
+        if let theData = theFullD["data"] as? [AnyObject]{
+            for eachItem in theData{
+                
+                guard let provider_id = eachItem[8] as? String else {continue}
+                guard let hospital_name = eachItem[9] as? String else {continue}
+                guard let address = eachItem[10] as? String else {continue}
+                guard let city = eachItem[11] as? String else {continue}
+                guard let state = eachItem[12] as? String else {continue}
+                guard let zip_code = eachItem[13] as? String else {continue}
+                guard let county_name = eachItem[14] as? String else {continue}
+                guard let hospital_type = eachItem[16] as? String else {continue}
+                guard let emergency_services = eachItem[18] as? Bool else {continue}
+                guard let phone_number = (eachItem[15] as? [AnyObject?])?[0] as? String  else {continue}
+                
+                var tempHospital = Hospital(provider_id: provider_id,
+                                            hospital_name: hospital_name,
+                                            address: address,
+                                            city: city,
+                                            state: state,
+                                            zip_code: zip_code,
+                                            county_name: county_name,
+                                            hospital_type: hospital_type,
+                                            emergency_services: emergency_services,
+                                            phone_number: phone_number)
+                
+                returnArray.append(tempHospital)
+            }
+        }
+        return returnArray
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+    }
 
+    override func viewDidAppear(_ animated: Bool) {
+        let theNodeView = NodeView(color: UIColor.red, displayValue: "H")
+        self.view.addSubview(theNodeView)
+        
+        theNodeView.center = self.view.center
+    }
+
+    @IBAction func constructTree(_ sender: UIButton) {
+        let backgroundQ = DispatchQueue.global(qos: .utility)
+        
+        let startTime = NSDate()
+        backgroundQ.async {
+            let theFinalD = self.extractJSONFromFile()
+            let theDataD = self.buildDictionary(theFullD: theFinalD)
+            print("Outside Function : Time to Run.. \(-startTime.timeIntervalSinceNow)")
+        }
+        
+        
+        // Do any additional setup after loading the view, typically from a nib.
         let theTree = BTree()
         theTree.insertNoder(inputNode: BTNode(8))
         theTree.insertNoder(inputNode: BTNode(3))
@@ -26,27 +117,20 @@ class ViewController: UIViewController {
         theTree.insertNoder(inputNode: BTNode(13))
         theTree.insertNoder(inputNode: BTNode(0))
         theTree.insertNoder(inputNode: BTNode(-1))
-
+        
         print("Searching....10 \(theTree.find(10))")
         print("Delete Status ... \(theTree.delete(10))")
         print("Searching....10 \(theTree.find(10))")
-
+        
         let theTreeViewer = BTViewer()
         theTreeViewer.displayTree(theTree)
-
+        
         print("result \(theTree.traverseTree(traversalType: .PreOrder))")
         print("result \(theTree.traverseTree(traversalType: .PostOrder))")
         print("result \(theTree.traverseTree(traversalType: .InOrder))")
+    }
 
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        let theNodeView = NodeView(color: UIColor.red, displayValue: "H")
-        self.view.addSubview(theNodeView)
-        
-        theNodeView.center = self.view.center
-        
-    }
+
 }
 
 //func ==(lhs : BTNode , rhs : BTNode) {return lhs.value == rhs.value}

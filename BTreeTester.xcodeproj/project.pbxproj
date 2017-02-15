@@ -13,6 +13,7 @@
 		2F7F8E801E517BFA009DE931 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2F7F8E7F1E517BFA009DE931 /* Assets.xcassets */; };
 		2F7F8E831E517BFA009DE931 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2F7F8E811E517BFA009DE931 /* LaunchScreen.storyboard */; };
 		2F7F8E8B1E519DEA009DE931 /* TreeDisplayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F7F8E8A1E519DEA009DE931 /* TreeDisplayer.swift */; };
+		2F7F8E8D1E542850009DE931 /* HospitalData.json in Resources */ = {isa = PBXBuildFile; fileRef = 2F7F8E8C1E542850009DE931 /* HospitalData.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		2F7F8E821E517BFA009DE931 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2F7F8E841E517BFA009DE931 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2F7F8E8A1E519DEA009DE931 /* TreeDisplayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreeDisplayer.swift; sourceTree = "<group>"; };
+		2F7F8E8C1E542850009DE931 /* HospitalData.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = HospitalData.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +59,7 @@
 			isa = PBXGroup;
 			children = (
 				2F7F8E781E517BFA009DE931 /* AppDelegate.swift */,
+				2F7F8E8C1E542850009DE931 /* HospitalData.json */,
 				2F7F8E7A1E517BFA009DE931 /* ViewController.swift */,
 				2F7F8E8A1E519DEA009DE931 /* TreeDisplayer.swift */,
 				2F7F8E7C1E517BFA009DE931 /* Main.storyboard */,
@@ -130,6 +133,7 @@
 				2F7F8E831E517BFA009DE931 /* LaunchScreen.storyboard in Resources */,
 				2F7F8E801E517BFA009DE931 /* Assets.xcassets in Resources */,
 				2F7F8E7E1E517BFA009DE931 /* Main.storyboard in Resources */,
+				2F7F8E8D1E542850009DE931 /* HospitalData.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
